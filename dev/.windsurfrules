@@ -1,0 +1,44 @@
+# Windsurf Rules for Jedi-Ops
+
+## Project Purpose
+Jedi-Ops is a worker queue platform built on Cloudflare Workers with a modular architecture that processes different types of messages asynchronously.
+
+## Code Architecture
+- Follows a modular pattern with clearly separated concerns
+- Uses TypeScript interfaces for message types
+- Factory functions ensure consistent message creation
+- Queue processor routes messages based on type
+
+## Extension Pattern
+When adding new message types:
+1. Define interface extending BaseMessage in src/todo.ts
+2. Create factory function with validation in src/todo.ts
+3. Add API endpoint in src/index.ts
+4. Implement processor in workers/todo-processor/index.ts
+5. Register processor in todoProcessors object
+
+## Naming Conventions
+- Message types: PascalCase with "Message" suffix (e.g., CounterMessage)
+- Factory functions: camelCase with "create" prefix (e.g., createCounter)
+- Processor functions: camelCase with "process" prefix (e.g., processCounter)
+
+## Best Practices
+- Include validation in all factory functions
+- Use specific error types (ValidationError vs. ProcessingError)
+- Make errors retryable or non-retryable as appropriate
+- Document new message types and processors
+
+## Environment Configuration
+- AUTH_KEY is required for API authentication
+- UPSTASH_REDIS_URL/TOKEN needed for Redis functionality
+- All config comes from .env file in local dev
+
+## Testing Guidelines
+- Test all factory functions for validation logic
+- Test message routing in the processor
+- Test API endpoints with valid and invalid inputs
+
+## Common Issues
+- Missing X-Auth-Key in API requests
+- Forgetting to register processors in todoProcessors object
+- Not updating TodoMessage union type with new message types

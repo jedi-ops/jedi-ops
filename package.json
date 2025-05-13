@@ -1,0 +1,43 @@
+{
+  "name": "create-jedi-ops",
+  "version": "0.0.1",
+  "description": "CLI tool for creating worker queue platforms on Cloudflare Workers",
+  "main": "dist/cli.js",
+  "type": "commonjs",
+  "bin": {
+    "create-jedi-ops": "dist/cli.js",
+    "jedi-ops": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "start": "node dist/cli.js",
+    "dev": "tsc -w",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && npm link && jedi-ops --help"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "queue",
+    "serverless",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "fs-extra": "^11.1.1",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.5",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
+    "@types/inquirer": "^8.2.6",
+    "@types/node": "^20.4.5",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

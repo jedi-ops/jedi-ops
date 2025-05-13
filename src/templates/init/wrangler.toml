@@ -1,0 +1,24 @@
+name = "jedi-ops-project"
+main = "src/index.ts"
+compatibility_date = "2024-05-13"
+compatibility_flags = []
+
+# Environment variables are automatically loaded from .env file
+# [vars]
+# These values are fallbacks and will be overridden by .env values
+# AUTH_KEY = "change-this-to-a-secure-key"
+# UPSTASH_REDIS_URL = ""
+# UPSTASH_REDIS_TOKEN = ""
+
+# Define queue for the worker
+[[queues.producers]]
+queue = "todo-queue"
+binding = "TODO_QUEUE"
+
+# Configure the todo processor consumer
+[[queues.consumers]]
+queue = "todo-queue"
+max_batch_size = 20
+max_batch_timeout = 10
+max_retries = 3
+dead_letter_queue = "todo-dlq"

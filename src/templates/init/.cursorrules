@@ -1,0 +1,111 @@
+# Cursor Rules for Jedi-Ops
+
+## Project Overview
+Jedi-Ops is a worker queue platform for Cloudflare Workers that processes messages asynchronously using a modular, type-safe architecture.
+
+## Key Files
+- `src/todo.ts`: Central file for message type definitions and factory functions
+- `src/index.ts`: API endpoints and main worker entry point
+- `workers/todo-processor/index.ts`: Queue processor implementation
+- `wrangler.toml`: Cloudflare Workers configuration
+
+## Core Patterns
+
+### Message Type Pattern
+```typescript
+// 1. Define interface extending BaseMessage
+export interface NewMessage extends BaseMessage {
+  type: 'new_type';
+  data: {
+    // Your message-specific fields
+    field1: string;
+    field2: number;
+  };
+}
+
+// 2. Add to union type
+export type TodoMessage = CounterMessage | TaskMessage | ReminderMessage | NewMessage;
+
+// 3. Create factory function with validation
+export function createNewType(field1: string, field2: number): NewMessage {
+  if (!field1) {
+    throw new Error('field1 is required');
+  }
+  
+  return {
+    type: 'new_type',
+    timestamp: Date.now(),
+    data: {
+      field1,
+      field2
+    }
+  };
+}
+```
+
+### Processor Pattern
+```typescript
+// In workers/todo-processor/index.ts
+
+// 1. Create processor function
+async function processNewType(message: NewMessage, env: Env): Promise<void> {
+  // Validate
+  if (!message.data.field1) {
+    throw new ValidationError('Missing field1');
+  }
+  
+  // Process
+  console.log(`Processing new type: ${message.data.field1}`);
+  
+  // Add your processing logic here
+}
+
+// 2. Register in processors object
+const todoProcessors = {
+  counter: processCounter,
+  task: processTask,
+  reminder: processReminder,
+  new_type: processNewType  // Add your processor here
+};
+```
+
+### API Endpoint Pattern
+```typescript
+// In src/index.ts
+
+// Add API endpoint
+api.post('/api/todo/new_type', async (c) => {
+  try {
+    const data = await c.req.json();
+    
+    // Use factory function
+    const message = createNewType(data.field1, data.field2);
+    
+    // Send to queue
+    await c.env.TODO_QUEUE.send(message);
+    
+    return c.json({
+      success: true,
+      message: 'New type queued successfully'
+    });
+  } catch (error: any) {
+    // Error handling
+    return c.json(
+      {
+        success: false,
+        error: error.message
+      },
+      error instanceof ValidationError ? 400 : 500
+    );
+  }
+});
+```
+
+## Command Reference
+- `bun install`: Install dependencies
+- `bun start`: Start development server
+- `bun run deploy`: Deploy to Cloudflare
+
+## Environment Variables
+- Required: `AUTH_KEY`
+- Optional: `UPSTASH_REDIS_URL`, `UPSTASH_REDIS_TOKEN`
