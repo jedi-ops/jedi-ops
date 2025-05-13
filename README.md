@@ -160,5 +160,4 @@ Jedi-Ops simplifies building serverless applications with Cloudflare Workers. By
 ```
 
 ## License
-
-MIT
+GNU General Public License v3.0
